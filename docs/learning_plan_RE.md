@@ -9,7 +9,7 @@ Designed for your background (algorithms, CSO, some C/C++, compilers) and learni
 ### Tracks (choose-your-path)
 - **Core RE Skills**: Assembly, calling conventions, binaries, tooling.
 - **Systems & Compilers**: Compilers/IR, linkers/loaders, OS/ABI internals.
-- **Applied Security**: Crackmes, CTF pwn, reversing protections, instrumentation.
+- **Applied Security & CTF**: Crackmes, CTF pwn/rev, reversing protections, instrumentation, writeups.
 
 ### Weekly cadence (flexible)
 - **2x Focus Blocks (90–120 min)**: One theory, one tooling/project.
@@ -34,6 +34,12 @@ Install hints (Homebrew):
 - `xcode-select --install` (Command Line Tools)
 - Optional Docker Desktop for macOS.
 
+### Tooling philosophy (free & manual-first)
+- Prefer free, OSS tools: Ghidra, rizin/radare2, Cutter, lldb, `otool`/`nm`/`strings`, `llvm-objdump`.
+- Practice manual workflows: disassemble with `otool -tvV` or `llvm-objdump -d`, enumerate symbols with `nm`, scan with `strings`, and correlate in Ghidra.
+- For Linux targets in Docker: use `gdb` with `pwndbg`/`gef` as needed; keep LLDB on macOS.
+- Paid tools (Hopper, Binary Ninja, IDA) are optional; this plan does not rely on them.
+
 ---
 
 ## Immediate 2-week plan (fast start)
@@ -45,6 +51,11 @@ Install hints (Homebrew):
   - Solve 3 crackmes (ARM64 or cross-compile to Linux x86_64 in Docker). Aim: identify main, find comparison logic, patch.
   - Dynamic instrumentation: write one simple Frida script to hook `strcmp`/`strncmp` in your crackme.
   - Reflection: capture patterns you used (string refs, xrefs, decompiler pitfalls).
+
+## CTF integration
+- Weekly: 1–2 CTF-style challenges (rev/pwn) from `picoCTF`, `pwn.college` labs, or recent `CTFtime` events.
+- Focus categories: reversing, binary exploitation, sometimes crypto/forensics when relevant to binaries.
+- Process: attempt → take notes → read 1–2 top writeups → redo quickly from scratch.
 
 ---
 
@@ -96,14 +107,24 @@ Each project should include: goals, constraints, writeup, and a checklist of tec
   - LLVM Language Reference + Writing an LLVM Pass (docs)
 - **Courses/Tracks**
   - pwn.college (binary exploitation, CTF-style)
-  - NSA Ghidra training materials
   - OpenSecurityTraining2 (OST2) – x86/x64, ARM, RE classes
+  - NSA Ghidra training materials
+  - picoCTF (beginner-friendly CTF challenges)
+  - CSAW CTF, Google CTF, UIUCTF (follow on CTFtime)
+  - Hack The Box Academy free modules (intro reversing/pwn)
 - **References**
   - Apple Mach-O File Format Reference; dyld & codesigning docs
   - System V AMD64 ABI; AAPCS64
   - radare2/rizin, Frida, Ghidra user guides
 - **Communities**
   - CTFtime, crackmes.one, r/ReverseEngineering, Malware Unicorn labs
+- **Ground truth (authoritative)**
+  - System V AMD64 ABI; AAPCS64 (official ABI docs)
+  - ELF Generic ABI (gABI) and Tool Interface Standards (TIS); `man ld.so`
+  - Apple Mach-O, dyld, codesigning (Apple Developer docs, `man mach-o`)
+  - LLVM Language Reference; Clang/LLD docs
+  - C standard drafts (N1570 C11), POSIX spec; Linux man-pages project
+  - ARM ARM (AArch64), Intel/AMD manuals (for x86-64 reference)
 
 ---
 
