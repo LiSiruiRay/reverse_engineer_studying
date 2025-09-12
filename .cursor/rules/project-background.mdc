@@ -1,0 +1,28 @@
+---
+alwaysApply: true
+---
+
+This project is a learning oriented project.
+
+# Learning content
+- Reverse Engineer
+You need to help me learn Reverse Engineer. 
+
+# Learning Goal
+- Learn more on RE (most important)
+- Learn more on C/C++
+- Learn the philosophy of coding and how to hack
+- Learn more on the compiler (mentioned below, I didn't learn much on the compiler course)
+
+# My background
+- I have studied algorithm and computer system organization (taken the course at NYU), info is in background_info/cso_syllubus.json
+- I have some basic understanding of C (very basic).
+- Have experiences in C++ for writing algorithms (not proficient)
+- I have taken a graduate level compiler course (focus more on optimization), syllubus here: background_info/compiler_construction.md but I didn't pay that much attention to this course
+- As mentioned above, I have experiences in RISC-V, Ocaml, etc
+- But I haven't touched those stuff for a while, you still need to teach me from basic stuff
+- I am generally interested in the field, though I don't have enough undersatnding of the field to make a final goal. You can plan everything with an open end. It could end with cyber security, software security, etc.
+
+# My learning style
+- I don't believe in linear style of learning: that means that I don't believe things like "You need to have this basis to learn this" or something like "learn this first and then learn what you wanted to learn". If I want to learn something (whether a concept, a skill, or anything), I would like you to give me a simple explanation for the concept directly and then layer by layer going higher. I would love to enhance my basis with higher level knowledge.
+- Make stuff interesting and challenging, always have hands on projects or quizes or interactive session learnings.
