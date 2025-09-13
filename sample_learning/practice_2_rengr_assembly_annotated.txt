@@ -1,0 +1,122 @@
+Author: @Ray Li
+Date: 2025-09-13
+Description: Annotated ARM64 assembly for practice_2_rengr focusing on encrypt/decrypt and control flow.
+
+❯ otool -tV practice_2_rengr
+practice_2_rengr:
+(__TEXT,__text) section
+_encrypt_decrypt:
+0000000100003cfc        sub     sp, sp, #0x30        ; prologue: allocate 0x30 bytes on stack
+0000000100003d00        stp     x29, x30, [sp, #0x20] ; save frame pointer (x29) and link register (x30)
+0000000100003d04        add     x29, sp, #0x20       ; set new frame pointer
+0000000100003d08        stur    x0, [x29, #-0x8]     ; save arg0 (pointer to string) at FP-8
+0000000100003d0c        sturb   w1, [x29, #-0x9]     ; save arg1 (1-byte key) at FP-9
+0000000100003d10        str     wzr, [sp, #0x10]     ; index = 0 (wzr is zero register)
+0000000100003d14        b       0x100003d18          ; jump to loop-head setup
+0000000100003d18        ldrsw   x8, [sp, #0x10]      ; x8 = sign-extended (int) index
+0000000100003d1c        str     x8, [sp, #0x8]       ; spill x8 (current index) to [sp+0x8]
+0000000100003d20        ldur    x0, [x29, #-0x8]     ; reload arg0: x0 = base pointer to string
+0000000100003d24        bl      0x100003ee0          ; call strlen(s)
+0000000100003d28        ldr     x8, [sp, #0x8]       ; x8 = index (reloaded)
+0000000100003d2c        subs    x8, x8, x0           ; flags set by (index - len): index < len → borrow
+0000000100003d30        cset    w8, hs               ; w8 = 1 if index >= len ("higher or same"), else 0
+0000000100003d34        tbnz    w8, #0x0, 0x100003d6c ; if done (w8 bit0 == 1) → exit
+0000000100003d38        b       0x100003d3c          ; else continue loop body
+0000000100003d3c        ldursb  w10, [x29, #-0x9]    ; w10 = key (sign-extended byte)
+0000000100003d40        ldur    x8, [x29, #-0x8]     ; x8 = base pointer
+0000000100003d44        ldrsw   x9, [sp, #0x10]      ; x9 = index (sign-extended)
+0000000100003d48        add     x9, x8, x9           ; x9 = &s[index]
+0000000100003d4c        ldrsb   w8, [x9]             ; w8 = s[index] (sign-extended byte)
+0000000100003d50        eor     w8, w8, w10          ; XOR: w8 ^= key   ← this is the XOR instruction
+0000000100003d54        strb    w8, [x9]             ; s[index] = w8 (write back in-place)
+0000000100003d58        b       0x100003d5c          ; jump to increment index
+0000000100003d5c        ldr     w8, [sp, #0x10]      ; w8 = index
+0000000100003d60        add     w8, w8, #0x1         ; index++
+0000000100003d64        str     w8, [sp, #0x10]      ; store updated index
+0000000100003d68        b       0x100003d18          ; back-edge to loop head (repeat)
+0000000100003d6c        ldp     x29, x30, [sp, #0x20] ; epilogue: restore FP/LR
+0000000100003d70        add     sp, sp, #0x30        ; deallocate stack frame
+0000000100003d74        ret                          ; return (same function decrypts if called twice)
+_secret_function:
+0000000100003d78        stp     x29, x30, [sp, #-0x10]! ; prologue (alloc 16, store FP/LR)
+0000000100003d7c        mov     x29, sp               ; set frame pointer
+0000000100003d80        adrp    x0, 0 ; 0x100003000   ; load page of literal pool
+0000000100003d84        add     x0, x0, #0xeec        ; x0 = "\n[+] You have successfully reversed the binary!\n"
+0000000100003d88        bl      0x100003ec8          ; printf(x0)
+0000000100003d8c        ldp     x29, x30, [sp], #0x10 ; epilogue (restore, dealloc)
+0000000100003d90        ret
+_main:
+0000000100003d94        sub     sp, sp, #0x60        ; prologue: allocate 0x60
+0000000100003d98        stp     x29, x30, [sp, #0x50] ; save FP/LR
+0000000100003d9c        add     x29, sp, #0x50       ; set FP
+0000000100003da0        adrp    x8, 1 ; 0x100004000  ; stack protector (guard) machinery
+0000000100003da4        ldr     x8, [x8, #0x8]       ; load __stack_chk_guard ptr
+0000000100003da8        ldr     x8, [x8]             ; guard value
+0000000100003dac        stur    x8, [x29, #-0x8]     ; save guard
+0000000100003db0        str     wzr, [sp, #0x1c]     ; zero local (unused counter)
+0000000100003db4        mov     w8, #0x58            ; key = 0x58 (decimal 88)
+0000000100003db8        strb    w8, [sp, #0x1b]      ; store key byte on stack
+0000000100003dbc        adrp    x9, 0 ; 0x100003000  ; address of literal string
+0000000100003dc0        add     x9, x9, #0xf1d       ; x9 -> "Hello, Reverse Engineer!"
+0000000100003dc4        ldr     q0, [x9]             ; load first 16 bytes (vector) of string
+0000000100003dc8        add     x8, sp, #0x20        ; x8 = buffer on stack for message
+0000000100003dcc        str     x8, [sp, #0x8]       ; save buffer ptr
+0000000100003dd0        str     q0, [sp, #0x20]      ; copy first 16 bytes to buffer
+0000000100003dd4        ldur    q0, [x9, #0x9]       ; load next 16 bytes (overlapping by 9)
+0000000100003dd8        stur    q0, [x8, #0x9]       ; store into buffer (completes string copy)
+0000000100003ddc        mov     x9, sp               ; temp base = sp
+0000000100003de0        str     x8, [x9]             ; store buffer ptr at [sp]
+0000000100003de4        adrp    x0, 0 ; 0x100003000  ; printf("Original Message: %s\n", buffer)
+0000000100003de8        add     x0, x0, #0xf36
+0000000100003dec        bl      0x100003ec8          ; call printf
+0000000100003df0        ldr     x0, [sp, #0x8]       ; x0 = buffer
+0000000100003df4        ldrsb   w1, [sp, #0x1b]      ; w1 = key (byte)
+0000000100003df8        bl      _encrypt_decrypt     ; encrypt in-place
+0000000100003dfc        ldr     x8, [sp, #0x8]       ; reload buffer
+0000000100003e00        mov     x9, sp               ; temp base
+0000000100003e04        str     x8, [x9]             ; store buffer ptr for printf
+0000000100003e08        adrp    x0, 0 ; 0x100003000
+0000000100003e0c        add     x0, x0, #0xf4c       ; "Encrypted Message: %s\n"
+0000000100003e10        bl      0x100003ec8          ; printf
+0000000100003e14        ldr     x0, [sp, #0x8]       ; x0 = buffer
+0000000100003e18        ldrsb   w1, [sp, #0x1b]      ; w1 = key
+0000000100003e1c        bl      _encrypt_decrypt     ; decrypt (XOR again)
+0000000100003e20        ldr     x8, [sp, #0x8]       ; reload buffer
+0000000100003e24        mov     x9, sp
+0000000100003e28        str     x8, [x9]             ; store buffer ptr
+0000000100003e2c        adrp    x0, 0 ; 0x100003000
+0000000100003e30        add     x0, x0, #0xf63       ; "Decrypted Message: %s\n"
+0000000100003e34        bl      0x100003ec8          ; printf
+0000000100003e38        adrp    x0, 0 ; 0x100003000  ; prompt for passcode
+0000000100003e3c        add     x0, x0, #0xf7a       ; "\nEnter passcode: "
+0000000100003e40        bl      0x100003ec8          ; printf
+0000000100003e44        mov     x9, sp               ; temp base
+0000000100003e48        add     x8, sp, #0x14        ; x8 = &passcode_input
+0000000100003e4c        str     x8, [x9]             ; store pointer for scanf
+0000000100003e50        adrp    x0, 0 ; 0x100003000
+0000000100003e54        add     x0, x0, #0xf8c       ; format "%d"
+0000000100003e58        bl      0x100003ed4          ; scanf("%d", &passcode_input)
+0000000100003e5c        ldr     w8, [sp, #0x14]      ; w8 = passcode_input
+0000000100003e60        subs    w8, w8, #0x539       ; w8 = input - 0x539; flags set
+0000000100003e64        cset    w8, ne               ; w8 = (input != 0x539)
+0000000100003e68        tbnz    w8, #0x0, 0x100003e78 ; if not equal → wrong path
+0000000100003e6c        b       0x100003e70          ; else go call secret
+0000000100003e70        bl      _secret_function     ; success
+0000000100003e74        b       0x100003e88          ; skip wrong message
+0000000100003e78        adrp    x0, 0 ; 0x100003000
+0000000100003e7c        add     x0, x0, #0xf8f       ; "\n[-] Wrong passcode!\n"
+0000000100003e80        bl      0x100003ec8          ; printf
+0000000100003e84        b       0x100003e88          ; join
+0000000100003e88        ldur    x9, [x29, #-0x8]     ; load saved guard
+0000000100003e8c        adrp    x8, 1 ; 0x100004000
+0000000100003e90        ldr     x8, [x8, #0x8]
+0000000100003e94        ldr     x8, [x8]
+0000000100003e98        subs    x8, x8, x9           ; compare guard
+0000000100003e9c        cset    w8, eq               ; w8 = 1 if guard unchanged
+0000000100003ea0        tbnz    w8, #0x0, 0x100003eac ; if equal → branch to fail? (stack check pattern)
+0000000100003ea4        b       0x100003ea8          ; fallthrough
+0000000100003ea8        bl      0x100003ebc          ; __stack_chk_fail (if mismatch)
+0000000100003eac        mov     w0, #0x0             ; return 0
+0000000100003eb0        ldp     x29, x30, [sp, #0x50] ; restore FP/LR
+0000000100003eb4        add     sp, sp, #0x60        ; dealloc stack
+0000000100003eb8        ret                          ; return from main
