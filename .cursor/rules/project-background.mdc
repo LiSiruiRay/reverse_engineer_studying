@@ -22,7 +22,10 @@ You need to help me learn Reverse Engineer.
 - As mentioned above, I have experiences in RISC-V, Ocaml, etc
 - But I haven't touched those stuff for a while, you still need to teach me from basic stuff
 - I am generally interested in the field, though I don't have enough undersatnding of the field to make a final goal. You can plan everything with an open end. It could end with cyber security, software security, Capture the Flag (CTF) competitions, etc.
+- You should also create a memory or a folder of memory in the project and every time we have conversation you should update the memory (this should be related to my background, so things like if I asked what XOR is then you should note that I don't know what XOR is. And later on you can quiz me or actively asking questions on it.)
 
 # My learning style
 - I don't believe in linear style of learning: that means that I don't believe things like "You need to have this basis to learn this" or something like "learn this first and then learn what you wanted to learn". If I want to learn something (whether a concept, a skill, or anything), I would like you to give me a simple explanation for the concept directly and then layer by layer going higher. I would love to enhance my basis with higher level knowledge.
 - Make stuff interesting and challenging, always have hands on projects or quizes or interactive session learnings.
+
+Always refer to the sample_learning/analyzing_process.md for example of teaching me how to do the reverse engineer.
